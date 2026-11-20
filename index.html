@@ -209,4 +209,54 @@ document.getElementById('item').value='';
 }
 </script>
 </body>
+  
+<script>
+function loadProjects(){
+  const projects=JSON.parse(localStorage.getItem('constructionProjects')||'[]');
+  let box=document.getElementById('savedProjects');
+  if(!box)return;
+  box.innerHTML='';
+  projects.forEach((p,i)=>{
+    const div=document.createElement('div');
+    div.style.padding='12px';
+    div.style.margin='8px 0';
+    div.style.background='#1e2b40';
+    div.style.borderRadius='8px';
+    div.textContent=p.name+' - '+p.date;
+    const btn=document.createElement('button');
+    btn.textContent='Delete';
+    btn.onclick=()=>{
+      projects.splice(i,1);
+      localStorage.setItem('constructionProjects',JSON.stringify(projects));
+      loadProjects();
+    };
+    div.appendChild(btn);
+    box.appendChild(div);
+  });
+}
+
+function saveNewProject(){
+  const input=document.getElementById('newProject');
+  if(!input.value.trim())return alert('Enter project name');
+  const projects=JSON.parse(localStorage.getItem('constructionProjects')||'[]');
+  projects.push({
+    name:input.value.trim(),
+    date:new Date().toLocaleDateString()
+  });
+  localStorage.setItem('constructionProjects',JSON.stringify(projects));
+  input.value='';
+  loadProjects();
+  alert('Project saved!');
+}
+
+window.addEventListener('DOMContentLoaded',loadProjects);
+</script>
+
+<div class="panel">
+<h2>My Saved Projects</h2>
+<input id="newProject" placeholder="Enter project name">
+<button onclick="saveNewProject()">Save Project</button>
+<div id="savedProjects"></div>
+</div>
+
 </html>
