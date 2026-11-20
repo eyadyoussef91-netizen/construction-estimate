@@ -1,1 +1,144 @@
 
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Construction Estimate</title>
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#101827;color:#f1f5f9;font-family:Arial,sans-serif}
+header{background:#172438;padding:22px}
+h1{margin:0;color:#f59e0b}
+header p{color:#aab7c8}
+main{max-width:950px;margin:25px auto;padding:15px}
+nav{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px}
+button{background:#f59e0b;color:#111827;border:0;padding:12px 17px;border-radius:7px;font-weight:bold;cursor:pointer}
+button.active{background:#fff}
+.panel{background:#1e2b40;padding:22px;border-radius:12px;margin-bottom:15px}
+input,select{width:100%;padding:12px;margin:7px 0 15px;background:#101827;color:white;border:1px solid #475569;border-radius:6px}
+label{color:#cbd5e1}
+.result{font-size:24px;color:#fbbf24;font-weight:bold;margin-top:15px}
+.hidden{display:none}
+table{width:100%;border-collapse:collapse}
+td,th{padding:10px;border-bottom:1px solid #475569;text-align:left}
+small{color:#94a3b8}
+</style>
+</head>
+<body>
+<header>
+<h1>CONSTRUCTION ESTIMATE</h1>
+<p>Professional Construction Quantity & Cost Calculator</p>
+</header>
+<main>
+<nav>
+<button class="active" onclick="show('dashboard',this)">Dashboard</button>
+<button onclick="show('concrete',this)">Concrete</button>
+<button onclick="show('excavation',this)">Excavation</button>
+<button onclick="show('steel',this)">Steel</button>
+<button onclick="show('formwork',this)">Formwork</button>
+<button onclick="show('boq',this)">BOQ</button>
+</nav>
+
+<section id="dashboard" class="panel">
+<h2>Welcome to Construction Estimate</h2>
+<p>Calculate quantities and prepare construction estimates.</p>
+<p>Available calculators: Concrete, Excavation, Reinforcement Steel and Formwork.</p>
+<p><small>Version 1.0 | Civil Engineering Tools</small></p>
+</section>
+
+<section id="concrete" class="panel hidden">
+<h2>Concrete Volume Calculator</h2>
+<label>Length (m)</label><input id="cl" type="number" step="any" value="1">
+<label>Width (m)</label><input id="cw" type="number" step="any" value="1">
+<label>Thickness / Height (m)</label><input id="ch" type="number" step="any" value="1">
+<button onclick="calcConcrete()">Calculate</button>
+<div id="cr" class="result">0.00 m³</div>
+</section>
+
+<section id="excavation" class="panel hidden">
+<h2>Excavation Calculator</h2>
+<label>Length (m)</label><input id="el" type="number" step="any" value="1">
+<label>Width (m)</label><input id="ew" type="number" step="any" value="1">
+<label>Depth (m)</label><input id="ed" type="number" step="any" value="1">
+<button onclick="calcExcavation()">Calculate</button>
+<div id="er" class="result">0.00 m³</div>
+</section>
+
+<section id="steel" class="panel hidden">
+<h2>Reinforcement Steel Weight</h2>
+<label>Bar diameter (mm)</label><input id="sd" type="number" value="12">
+<label>Total bar length (m)</label><input id="sl" type="number" step="any" value="10">
+<button onclick="calcSteel()">Calculate</button>
+<div id="sr" class="result">0.00 kg</div>
+<small>Formula: Diameter² / 162 × Total length</small>
+</section>
+
+<section id="formwork" class="panel hidden">
+<h2>Formwork Area Calculator</h2>
+<label>Length (m)</label><input id="fl" type="number" step="any" value="1">
+<label>Width (m)</label><input id="fw" type="number" step="any" value="1">
+<label>Height (m)</label><input id="fh" type="number" step="any" value="1">
+<button onclick="calcFormwork()">Calculate</button>
+<div id="fr" class="result">0.00 m²</div>
+<small>Calculates four vertical sides of a rectangular column.</small>
+</section>
+
+<section id="boq" class="panel hidden">
+<h2>Simple BOQ Cost Calculator</h2>
+<label>Item description</label><input id="item" placeholder="Example: Concrete">
+<label>Quantity</label><input id="qty" type="number" step="any" value="1">
+<label>Unit price ($)</label><input id="price" type="number" step="any" value="0">
+<button onclick="addItem()">Add BOQ item</button>
+<table>
+<thead><tr><th>Description</th><th>Quantity</th><th>Unit Price</th><th>Total</th></tr></thead>
+<tbody id="items"></tbody>
+</table>
+<div id="total" class="result">Total: $0.00</div>
+</section>
+</main>
+
+<script>
+function show(id,btn){
+document.querySelectorAll('main section').forEach(s=>s.classList.add('hidden'));
+document.getElementById(id).classList.remove('hidden');
+document.querySelectorAll('nav button').forEach(b=>b.classList.remove('active'));
+btn.classList.add('active');
+}
+function val(id){return Number(document.getElementById(id).value)}
+function valid(ids){return ids.every(id=>Number.isFinite(val(id))&&val(id)>0)}
+function calcConcrete(){
+if(!valid(['cl','cw','ch']))return alert('Enter positive dimensions');
+document.getElementById('cr').textContent=(val('cl')*val('cw')*val('ch')).toFixed(3)+' m³';
+}
+function calcExcavation(){
+if(!valid(['el','ew','ed']))return alert('Enter positive dimensions');
+document.getElementById('er').textContent=(val('el')*val('ew')*val('ed')).toFixed(3)+' m³';
+}
+function calcSteel(){
+if(!valid(['sd','sl']))return alert('Enter positive values');
+document.getElementById('sr').textContent=(val('sd')**2/162*val('sl')).toFixed(2)+' kg';
+}
+function calcFormwork(){
+if(!valid(['fl','fw','fh']))return alert('Enter positive dimensions');
+document.getElementById('fr').textContent=(2*(val('fl')+val('fw'))*val('fh')).toFixed(2)+' m²';
+}
+let grandTotal=0;
+function addItem(){
+let item=document.getElementById('item').value.trim();
+let q=val('qty'),p=val('price');
+if(!item||!Number.isFinite(q)||!Number.isFinite(p)||q<=0||p<0)return alert('Check item and values');
+let total=q*p;
+let row=document.createElement('tr');
+[item,q,p.toFixed(2),total.toFixed(2)].forEach(v=>{
+let cell=document.createElement('td');cell.textContent=v;row.appendChild(cell);
+});
+document.getElementById('items').appendChild(row);
+grandTotal+=total;
+document.getElementById('total').textContent='Total: $'+grandTotal.toFixed(2);
+document.getElementById('item').value='';
+}
+</script>
+</body>
+</html>
